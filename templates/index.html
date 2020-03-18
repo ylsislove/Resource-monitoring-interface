@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+    <title>监控界面</title>
+</head>
+
+<body>
+    <div id="container1" style="padding: 20px;"></div>
+    <div id="container2" style="padding: 20px;"></div>
+    <div id="container3" style="padding: 20px;"></div>
+    <script src="../static/js/g2.min.js"></script>
+    <script>
+
+        // 初始化数据格式
+        const data = [];
+        const net_data = [];
+        const time = Math.floor(new Date().getTime() / 1000) * 1000;
+
+        for (let i = -299; i <= 0; i++) {
+            data.push({
+                time: time + i * 1000,
+                value: 0,
+            });
+        }
+        for (let i = -299; i <= 0; i++) {
+            net_data.push({
+                time: time + i * 1000,
+                value: 0,
+                type: 'send',
+            });
+        }
+        console.log(data)
+        console.log(net_data)
+
+        // 创建图表
+        const mem_chart = new G2.Chart({
+            container: 'container1',
+            autoFit: true,
+            height: 200,
+        });
+        const cpu_chart = new G2.Chart({
+            container: 'container2',
+            autoFit: true,
+            height: 200,
+        });
+        const net_chart = new G2.Chart({
+            container: 'container3',
+            autoFit: true,
+            height: 200,
+        });
+
+        // 加载数据
+        mem_chart.data(data);
+        cpu_chart.data(data);
+        net_chart.data(net_data);
+
+        // 设置数据样式
+        mem_chart.scale({
+            time: {
+                type: 'time',
+                mask: 'HH:mm:ss',
+                nice: true,
+            },
+            value: {
+                nice: true,
+                formatter(value) {
+                    return value + ' M';
+                },
+                alias: '内存',
+            },
+        });
+        mem_chart.animate(false);
+
+        cpu_chart.scale({
+            time: {
+                type: 'time',
+                mask: 'HH:mm:ss',
+                nice: true,
+            },
+            value: {
+                nice: true,
+                min: 0,
+                max: 100,
+                formatter(value) {
+                    return value + '%';
+                },
+            },
+        });
+        cpu_chart.animate(false);
+
+        net_chart.scale({
+            time: {
+                type: 'time',
+                mask: 'HH:mm:ss',
+                nice: true,
+            },
+            value: {
+                nice: true,
+                formatter(value) {
+                    return value + ' KBps';
+                },
+            },
+        });
+        net_chart.animate(false);
+
+        // 进行数据渲染
+        mem_chart.area().position('time*value');
+        mem_chart.line().position('time*value');
+        mem_chart.render();
+
+        cpu_chart.area().position('time*value');
+        cpu_chart.line().position('time*value');
+        cpu_chart.render();
+
+        net_chart.tooltip({
+            showCrosshairs: true,
+            shared: true,
+        });
+        net_chart.area().position('time*value').color('type');
+        net_chart.line().position('time*value').color('type');
+        net_chart.render();
+
+        // 每秒刷新一次数据
+        setInterval(function () {
+            $.ajax({
+                type: "get",
+                url: "/data",
+                dataType: "json",
+                success: function (data) {
+                    mem_chart.changeData(data.mem);
+                    cpu_chart.changeData(data.cpu);
+                    net_chart.changeData(data.netinfo);
+                }
+            });
+        }, 1000);
+    </script>
+</body>
+
+</html>
