@@ -2,8 +2,7 @@
 服务器资源监控界面，flask + mysql + G2搭建
 
 ## 界面截图
-
-![index](index.png)
+![index](https://cdn.jsdelivr.net/gh/ylsislove/Resource-monitoring-interface/index.png)
 
 ## 运行
 
@@ -16,6 +15,5 @@
 打开浏览器，输入 http://localhost:5000 即可查看服务器资源监控界面
 
 ## 支持
-
-![赞赏码](reward.png)
+![赞赏码](https://cdn.jsdelivr.net/gh/ylsislove/Resource-monitoring-interface/reward.png)
 
